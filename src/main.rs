@@ -5,11 +5,11 @@ use num::BigUint;
 
 fn calc_fib(n: u64) -> BigUint {
     if n == 0 {
-        eprintln!("the index should begin with 1.");
+        eprintln!("the index should begin with 1");
         return 0u64.into();
     }
-    let mut a = (0u64).into();
-    let mut b = (1u64).into();
+    let mut a = 0u64.into();
+    let mut b = 1u64.into();
     for _ in 1..n {
         let c = &a + &b;
         a = b;
@@ -39,20 +39,26 @@ struct Args {
 }
 
 fn repl() {
-    println!("calculate the Fibonacci number.");
-    println!("interactive mode. (type `exit` to exit)");
-    const EXIT_STR: &str = "exit\n";
+    println!("Fibonacci calculator");
+    println!("interactive mode (type `exit` to exit)");
+    const EXIT_STR: &str = "exit";
 
     let mut s = String::new();
     let mut stdout = io::stdout();
     loop {
         print!("> ");
-        stdout.flush().expect("failed to print the `>`");
+        if stdout.flush().is_err() {
+            eprintln!("failed to print the prompt `>`");
+            break;
+        }
 
         s.clear();
-        io::stdin().read_line(&mut s).expect("failed to read input");
+        if io::stdin().read_line(&mut s).is_err() {
+            eprintln!("failed to read input");
+            break;
+        }
 
-        if s == EXIT_STR {
+        if s.trim() == EXIT_STR {
             break;
         }
 
