@@ -1,6 +1,5 @@
 use std::io::{self, Write};
 
-use clap::Parser;
 use num::BigUint;
 
 fn calc_fib(n: u64) -> BigUint {
@@ -33,30 +32,19 @@ fn test_calc_fib() {
     assert_eq!(calc_fib(10), 55u64.into());
 }
 
-#[derive(Parser, Debug)]
-struct Args {
-    num: Vec<u64>,
-}
-
-fn repl() {
+fn repl() -> anyhow::Result<()> {
     println!("Fibonacci calculator");
-    println!("interactive mode (type `exit` to exit)");
     const EXIT_STR: &str = "exit";
+    println!("interactive mode (type `{}` to exit)", EXIT_STR);
 
     let mut s = String::new();
     let mut stdout = io::stdout();
     loop {
         print!("> ");
-        if stdout.flush().is_err() {
-            eprintln!("failed to print the prompt `>`");
-            break;
-        }
+        stdout.flush()?;
 
         s.clear();
-        if io::stdin().read_line(&mut s).is_err() {
-            eprintln!("failed to read input");
-            break;
-        }
+        io::stdin().read_line(&mut s)?;
 
         if s.trim() == EXIT_STR {
             break;
@@ -69,16 +57,29 @@ fn repl() {
 
         println!("{}", calc_fib(num));
     }
+
+    Ok(())
 }
 
-fn main() {
-    let num_list = Args::parse().num;
-
-    if num_list.len() == 0 {
-        repl()
-    }
-
-    for num in num_list {
+fn run(args: &[String]) -> anyhow::Result<()> {
+    for num in args {
+        let Ok(num) = num.parse::<u64>() else {
+            eprintln!("invalid number, a none-negative integer is required");
+            continue;
+        };
         println!("fib({})={}", num, calc_fib(num));
     }
+    Ok(())
+}
+
+fn main() -> anyhow::Result<()> {
+    let args: Vec<String> = std::env::args().collect();
+
+    if args.len() == 1 {
+        repl()?;
+    } else {
+        run(&args[1..])?;
+    }
+
+    Ok(())
 }
