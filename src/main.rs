@@ -27,10 +27,9 @@ fn calc_fib_series(n: u64) -> impl Iterator<Item = BigUint> {
 
     (0..n).map(move |_| {
         let c = &a + &b;
-        let nb = c.clone();
         a = b.clone();
-        b = nb;
-        b.clone()
+        b = c.clone();
+        a.clone()
     })
 }
 
