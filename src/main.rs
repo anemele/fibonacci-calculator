@@ -17,6 +17,21 @@ fn calc_fib(n: u64) -> BigUint {
     b
 }
 
+#[test]
+fn test_calc_fib() {
+    assert_eq!(calc_fib(0), 0u64.into());
+    assert_eq!(calc_fib(1), 1u64.into());
+    assert_eq!(calc_fib(2), 1u64.into());
+    assert_eq!(calc_fib(3), 2u64.into());
+    assert_eq!(calc_fib(4), 3u64.into());
+    assert_eq!(calc_fib(5), 5u64.into());
+    assert_eq!(calc_fib(6), 8u64.into());
+    assert_eq!(calc_fib(7), 13u64.into());
+    assert_eq!(calc_fib(8), 21u64.into());
+    assert_eq!(calc_fib(9), 34u64.into());
+    assert_eq!(calc_fib(10), 55u64.into());
+}
+
 fn calc_fib_series(n: u64) -> impl Iterator<Item = BigUint> {
     if n == 0 {
         eprintln!("the index should begin with 1");
@@ -34,18 +49,25 @@ fn calc_fib_series(n: u64) -> impl Iterator<Item = BigUint> {
 }
 
 #[test]
-fn test_calc_fib() {
-    assert_eq!(calc_fib(0), 0u64.into());
-    assert_eq!(calc_fib(1), 1u64.into());
-    assert_eq!(calc_fib(2), 1u64.into());
-    assert_eq!(calc_fib(3), 2u64.into());
-    assert_eq!(calc_fib(4), 3u64.into());
-    assert_eq!(calc_fib(5), 5u64.into());
-    assert_eq!(calc_fib(6), 8u64.into());
-    assert_eq!(calc_fib(7), 13u64.into());
-    assert_eq!(calc_fib(8), 21u64.into());
-    assert_eq!(calc_fib(9), 34u64.into());
-    assert_eq!(calc_fib(10), 55u64.into());
+fn test_calc_fib_series() {
+    let mut fib_series = calc_fib_series(10);
+    assert_eq!(fib_series.next().unwrap(), 1u64.into());
+    assert_eq!(fib_series.next().unwrap(), 1u64.into());
+    assert_eq!(fib_series.next().unwrap(), 2u64.into());
+    assert_eq!(fib_series.next().unwrap(), 3u64.into());
+    assert_eq!(fib_series.next().unwrap(), 5u64.into());
+    assert_eq!(fib_series.next().unwrap(), 8u64.into());
+    assert_eq!(fib_series.next().unwrap(), 13u64.into());
+    assert_eq!(fib_series.next().unwrap(), 21u64.into());
+    assert_eq!(fib_series.next().unwrap(), 34u64.into());
+    assert_eq!(fib_series.next().unwrap(), 55u64.into());
+    assert_eq!(fib_series.next(), None);
+}
+
+#[test]
+fn test_calc_fib_series_invalid_index() {
+    let mut fib_series = calc_fib_series(0);
+    assert_eq!(fib_series.next(), None);
 }
 
 fn repl() -> anyhow::Result<()> {
