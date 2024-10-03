@@ -17,6 +17,23 @@ fn calc_fib(n: u64) -> BigUint {
     b
 }
 
+fn calc_fib_series(n: u64) -> impl Iterator<Item = BigUint> {
+    if n == 0 {
+        eprintln!("the index should begin with 1");
+    }
+
+    let mut a: BigUint = 0u64.into();
+    let mut b: BigUint = 1u64.into();
+
+    (1..n).map(move |_| {
+        let c = &a + &b;
+        let nb = c.clone();
+        a = b.clone();
+        b = nb;
+        b.clone()
+    })
+}
+
 #[test]
 fn test_calc_fib() {
     assert_eq!(calc_fib(0), 0u64.into());
@@ -51,7 +68,7 @@ fn repl() -> anyhow::Result<()> {
         }
 
         let Ok(num) = s.trim().parse::<u64>() else {
-            eprintln!("invalid number, a none-negative integer is required");
+            eprintln!("invalid number, a non-negative integer is required");
             continue;
         };
 
@@ -61,13 +78,21 @@ fn repl() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn run(args: &[String]) -> anyhow::Result<()> {
+fn calc_one(args: &[String]) -> anyhow::Result<()> {
     for num in args {
         let Ok(num) = num.parse::<u64>() else {
-            eprintln!("invalid number, a none-negative integer is required");
+            eprintln!("invalid number, a non-negative integer is required");
             continue;
         };
         println!("fib({})={}", num, calc_fib(num));
+    }
+    Ok(())
+}
+
+fn calc_series(num: &str) -> anyhow::Result<()> {
+    let num = num.parse::<u64>()?;
+    for num in calc_fib_series(num) {
+        println!("{}", num);
     }
     Ok(())
 }
@@ -77,8 +102,14 @@ fn main() -> anyhow::Result<()> {
 
     if args.len() == 1 {
         repl()?;
+    } else if args[1] == "series" {
+        if args.len() != 3 {
+            eprintln!("a non-negative integer is required");
+        } else {
+            calc_series(&args[2])?;
+        }
     } else {
-        run(&args[1..])?;
+        calc_one(&args[1..])?;
     }
 
     Ok(())
